@@ -1,55 +1,77 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const tripSchema = new mongoose.Schema(
-{
-    source: {
-        type: String,
-        required: true
-    },
+const TripSchema = new mongoose.Schema({
+  tripCode: {
+    type: String,
+    unique: true
+  },
+  source: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  destination: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  vehicleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle',
+    required: true
+  },
+  driverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Driver',
+    required: true
+  },
+  cargoWeightKg: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  plannedDistanceKm: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  status: {
+    type: String,
+    enum: ['Draft', 'Dispatched', 'Completed', 'Cancelled'],
+    default: 'Draft'
+  },
+  closingOdometerKm: {
+    type: Number,
+    default: null
+  },
+  fuelConsumedLiters: {
+    type: Number,
+    default: null
+  },
+  revenue: {
+    type: Number,
+    default: null
+  }
+}, { timestamps: true });
 
-    destination: {
-        type: String,
-        required: true
-    },
-
-    vehicle: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Vehicle",
-        required: true
-    },
-
-    driver: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Driver",
-        required: true
-    },
-
-    cargoWeight: {
-        type: Number,
-        required: true
-    },
-
-    plannedDistance: Number,
-
-    actualDistance: Number,
-
-    startOdometer: Number,
-
-    endOdometer: Number,
-
-    status: {
-        type: String,
-        enum: [
-            "DRAFT",
-            "DISPATCHED",
-            "COMPLETED",
-            "CANCELLED"
-        ],
-        default: "DRAFT"
+// Pre-save hook to auto-generate tripCode if not provided
+TripSchema.pre('save', async function (next) {
+  if (this.isNew && !this.tripCode) {
+    try {
+      const lastTrip = await this.constructor.findOne({}, {}, { sort: { 'createdAt': -1 } });
+      let nextNum = 1;
+      if (lastTrip && lastTrip.tripCode) {
+        const match = lastTrip.tripCode.match(/^TR(\d+)$/);
+        if (match) {
+          nextNum = parseInt(match[1], 10) + 1;
+        }
+      }
+      this.tripCode = `TR${String(nextNum).padStart(3, '0')}`;
+    } catch (err) {
+      return next(err);
     }
-},
-{
-    timestamps: true
+  }
+  next();
 });
 
-module.exports = mongoose.model("Trip", tripSchema);
+module.exports = mongoose.model('Trip', TripSchema);

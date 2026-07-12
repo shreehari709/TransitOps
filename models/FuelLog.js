@@ -1,29 +1,30 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const fuelLogSchema = new mongoose.Schema(
-{
-    vehicle: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Vehicle",
-        required: true
-    },
+const FuelLogSchema = new mongoose.Schema({
+  vehicleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle',
+    required: true
+  },
+  tripId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Trip',
+    default: null
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  liters: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  cost: {
+    type: Number,
+    required: true,
+    min: 0
+  }
+}, { timestamps: true });
 
-    trip: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Trip"
-    },
-
-    fuelLiters: Number,
-
-    cost: Number,
-
-    fuelDate: Date
-},
-{
-    timestamps: true
-});
-
-module.exports = mongoose.model(
-    "FuelLog",
-    fuelLogSchema
-);
+module.exports = mongoose.model('FuelLog', FuelLogSchema);

@@ -1,45 +1,49 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const driverSchema = new mongoose.Schema(
-{
-    name: {
-        type: String,
-        required: true
-    },
+const DriverSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  licenseNumber: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    uppercase: true
+  },
+  licenseCategory: {
+    type: String,
+    enum: ['LMV', 'HMV'],
+    required: true
+  },
+  licenseExpiryDate: {
+    type: Date,
+    required: true
+  },
+  contactNumber: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  safetyScore: {
+    type: Number,
+    default: 100,
+    min: 0,
+    max: 100
+  },
+  tripCompletionRate: {
+    type: Number,
+    default: 100,
+    min: 0,
+    max: 100
+  },
+  status: {
+    type: String,
+    enum: ['Available', 'On Trip', 'Off Duty', 'Suspended'],
+    default: 'Available'
+  }
+}, { timestamps: true });
 
-    licenseNumber: {
-        type: String,
-        required: true,
-        unique: true
-    },
-
-    licenseCategory: String,
-
-    licenseExpiryDate: {
-        type: Date,
-        required: true
-    },
-
-    contactNumber: String,
-
-    safetyScore: {
-        type: Number,
-        default: 100
-    },
-
-    status: {
-        type: String,
-        enum: [
-            "AVAILABLE",
-            "ON_TRIP",
-            "OFF_DUTY",
-            "SUSPENDED"
-        ],
-        default: "AVAILABLE"
-    }
-},
-{
-    timestamps: true
-});
-
-module.exports = mongoose.model("Driver", driverSchema);
+module.exports = mongoose.model('Driver', DriverSchema);

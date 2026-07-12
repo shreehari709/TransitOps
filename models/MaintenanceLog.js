@@ -1,40 +1,34 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const maintenanceSchema = new mongoose.Schema(
-{
-    vehicle: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Vehicle",
-        required: true
-    },
+const MaintenanceLogSchema = new mongoose.Schema({
+  vehicleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle',
+    required: true
+  },
+  serviceType: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  cost: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['Active', 'Completed'],
+    default: 'Active'
+  },
+  notes: {
+    type: String,
+    trim: true
+  }
+}, { timestamps: true });
 
-    maintenanceType: {
-        type: String,
-        required: true
-    },
-
-    description: String,
-
-    cost: Number,
-
-    startDate: Date,
-
-    endDate: Date,
-
-    status: {
-        type: String,
-        enum: [
-            "OPEN",
-            "COMPLETED"
-        ],
-        default: "OPEN"
-    }
-},
-{
-    timestamps: true
-});
-
-module.exports = mongoose.model(
-    "MaintenanceLog",
-    maintenanceSchema
-);
+module.exports = mongoose.model('MaintenanceLog', MaintenanceLogSchema);

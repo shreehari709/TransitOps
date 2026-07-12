@@ -1,39 +1,40 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const expenseSchema = new mongoose.Schema(
-{
-    vehicle: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Vehicle"
-    },
+const ExpenseSchema = new mongoose.Schema({
+  tripId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Trip',
+    default: null
+  },
+  vehicleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle',
+    required: true
+  },
+  toll: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  other: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  linkedMaintenanceCost: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  total: {
+    type: Number,
+    default: 0
+  }
+}, { timestamps: true });
 
-    trip: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Trip"
-    },
-
-    expenseType: {
-        type: String,
-        enum: [
-            "TOLL",
-            "MAINTENANCE",
-            "PARKING",
-            "REPAIR",
-            "OTHER"
-        ]
-    },
-
-    amount: Number,
-
-    description: String,
-
-    expenseDate: Date
-},
-{
-    timestamps: true
+ExpenseSchema.pre('save', function(next) {
+  this.total = this.toll + this.other + this.linkedMaintenanceCost;
+  next();
 });
 
-module.exports = mongoose.model(
-    "Expense",
-    expenseSchema
-);
+module.exports = mongoose.model('Expense', ExpenseSchema);
