@@ -1038,3 +1038,289 @@ button, input, select, textarea {
   align-items: center;
   justify-content: space-between;
 }
+
+/* --- Responsive UI Layout Refactoring --- */
+
+/* Sidebar drawer & mobile overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+  z-index: 99;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sidebar-close-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--status-red);
+}
+
+.sidebar-toggle-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Settings responsive grid */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 32px;
+}
+
+/* Guest credentials grid */
+.guest-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* Reusable responsive grids */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Filter bar responsive helpers */
+.filter-bar {
+  padding: 16px 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-bar-inputs {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+/* --- Media Queries for Responsive Optimization --- */
+
+/* Desktop & Large Screen Viewports */
+@media (min-width: 1025px) {
+  .app-container {
+    display: flex;
+  }
+}
+
+/* Tablets & Small Laptops (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px; /* Hide drawer */
+    z-index: 100;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+  
+  .sidebar-close-btn {
+    display: flex;
+  }
+  
+  .sidebar-toggle-btn {
+    display: flex;
+  }
+  
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .topbar-search {
+    width: 220px;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .page-container {
+    padding: 24px 16px;
+  }
+}
+
+/* Small Tablets & Large Phones (max-width: 768px) */
+@media (max-width: 768px) {
+  .grid-metrics {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .chart-wrapper {
+    height: 320px;
+    padding: 16px;
+  }
+  
+  .responsive-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .topbar-search {
+    display: none; /* Hide search bar on smaller viewports */
+  }
+
+  .topbar-user {
+    margin-left: auto;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-header .btn {
+    width: 100%;
+  }
+
+  /* Table responsiveness controls */
+  .table-responsive {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }
+
+  .custom-table {
+    min-width: 650px; /* Enforces inside-container scrolling */
+  }
+}
+
+/* Mobile Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .grid-metrics {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .user-badge {
+    display: none; /* Hide role badge inside header on micro screens */
+  }
+
+  .card-panel {
+    padding: 16px;
+  }
+
+  .guest-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guest-grid button {
+    grid-column: span 1 !important;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar-inputs {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-bar-inputs select {
+    width: 100% !important;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-footer {
+    padding: 12px 16px;
+  }
+
+  /* Typography scale */
+  .page-title h1 {
+    font-size: 22px;
+  }
+
+  .hero-section h1 {
+    font-size: 28px;
+  }
+
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-left {
+    padding: 32px 20px;
+    min-height: 250px;
+    flex: none;
+  }
+
+  .login-right {
+    padding: 32px 16px;
+    flex: 1;
+  }
+
+  .hero-section p {
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    min-height: 44px; /* Accessible touch target size */
+  }
+}

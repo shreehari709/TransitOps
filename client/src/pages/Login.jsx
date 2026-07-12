@@ -241,7 +241,7 @@ export default function Login() {
                 <span style={{ fontSize: '11px', color: '#94a3b8' }}>or sign in as guest</span>
                 <hr style={{ flex: 1, borderColor: 'var(--border-color)', opacity: 0.3 }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div className="guest-grid">
                 <button type="button" className="btn btn-secondary" onClick={() => handleGuestLogin('SuperAdmin')} style={{ gridColumn: 'span 2', padding: '8px 4px', fontSize: '11px', borderColor: '#f59e0b', color: '#f59e0b', fontWeight: 600 }}>
                   🔑 Super Admin Console
                 </button>

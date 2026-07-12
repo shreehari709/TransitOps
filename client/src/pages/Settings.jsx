@@ -145,7 +145,7 @@ export default function Settings() {
           <span style={{ color: '#94a3b8' }}>Loading config...</span>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '32px' }}>
+        <div className="settings-grid">
           {/* Left Column: Account Profile & Depot Configs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* Account Info Card */}

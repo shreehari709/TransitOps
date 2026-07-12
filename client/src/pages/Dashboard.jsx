@@ -99,9 +99,9 @@ export default function Dashboard() {
       </div>
 
       {/* Filter Bar */}
-      <div className="card-panel" style={{ padding: '16px 24px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+      <div className="card-panel filter-bar">
         <span style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase' }}>Filters</span>
-        <div style={{ display: 'flex', gap: '12px', flex: 1 }}>
+        <div className="filter-bar-inputs">
           <select 
             className="form-control" 
             style={{ width: '180px', padding: '6px 12px' }}

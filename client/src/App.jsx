@@ -12,7 +12,8 @@ import {
   LogOut, 
   Menu, 
   Search,
-  Bell
+  Bell,
+  X
 } from 'lucide-react';
 
 // Pages imports (we will write these next)
@@ -104,6 +105,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 function AppLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['FleetManager', 'Dispatcher', 'SafetyOfficer', 'FinancialAnalyst'] },
@@ -147,13 +149,24 @@ function AppLayout() {
 
   return (
     <div className="app-container">
+      {/* Sidebar Mobile Overlay Backdrop */}
+      <div 
+        className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`} 
+        onClick={() => setSidebarOpen(false)} 
+      />
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
-          <div className="brand-icon-wrapper" style={{ padding: '6px', borderRadius: '8px' }}>
-            <Compass style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+            <div className="brand-icon-wrapper" style={{ padding: '6px', borderRadius: '8px' }}>
+              <Compass style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
+            </div>
+            <h2>TransitOps</h2>
           </div>
-          <h2>TransitOps</h2>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+            <X size={18} />
+          </button>
         </div>
         <ul className="sidebar-menu">
           {filteredMenu.map(item => {
@@ -161,7 +174,11 @@ function AppLayout() {
             const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
             return (
               <li key={item.path} className="sidebar-item">
-                <Link to={item.path} className={`sidebar-link ${isActive ? 'active' : ''}`}>
+                <Link 
+                  to={item.path} 
+                  className={`sidebar-link ${isActive ? 'active' : ''}`}
+                  onClick={() => setSidebarOpen(false)}
+                >
                   <Icon />
                   <span>{item.name}</span>
                 </Link>
@@ -178,6 +195,10 @@ function AppLayout() {
       <div className="main-layout">
         {/* Topbar */}
         <header className="topbar">
+          <button className="sidebar-toggle-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu style={{ width: '20px', height: '20px' }} />
+          </button>
+          
           <div className="topbar-search">
             <Search />
             <input type="text" placeholder="Search fleet registry, drivers, active trips..." />

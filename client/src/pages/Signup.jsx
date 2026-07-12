@@ -230,7 +230,7 @@ export default function Signup() {
               {errors.email && <span style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px', display: 'block' }}>{errors.email}</span>}
             </div>
 
-            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-row responsive-grid-2">
               <div className="form-group">
                 <label>Password</label>
                 <div style={{ position: 'relative' }}>
