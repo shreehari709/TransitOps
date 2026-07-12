@@ -265,7 +265,7 @@ export default function Vehicles() {
               ) : (
                 <tr>
                   <td colSpan={isFleetManager ? 8 : 7} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-                    No vehicles found matching criteria.
+                    {vehicles.length === 0 ? "No vehicles yet — add your first one." : "No vehicles found matching criteria."}
                   </td>
                 </tr>
               )}

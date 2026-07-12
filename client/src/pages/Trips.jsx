@@ -349,7 +349,7 @@ export default function Trips() {
               ))
             ) : (
               <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '48px', color: '#94a3b8', border: '1px dashed var(--border-color)', borderRadius: '12px' }}>
-                No dispatches logged in system.
+                No trips yet — plan your first trip.
               </div>
             )}
           </div>

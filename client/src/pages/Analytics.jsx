@@ -128,12 +128,17 @@ export default function Analytics() {
       <div className="grid-metrics" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
         <div className="card-metric" style={{ borderLeft: '3px solid #10b981' }}>
           <span className="metric-title">Fuel Efficiency Average</span>
-          <span className="metric-value">{kpis.fuelEfficiency} <span style={{ fontSize: '14px', fontWeight: 500, color: '#94a3b8' }}>km/L</span></span>
+          <span className="metric-value">
+            {kpis.fuelEfficiency !== '—' && kpis.fuelEfficiency !== undefined ? `${kpis.fuelEfficiency} ` : '—'}
+            {kpis.fuelEfficiency !== '—' && kpis.fuelEfficiency !== undefined && <span style={{ fontSize: '14px', fontWeight: 500, color: '#94a3b8' }}>km/L</span>}
+          </span>
           <span className="metric-footer">Total Completed Distance / Fuel</span>
         </div>
         <div className="card-metric" style={{ borderLeft: '3px solid #3b82f6' }}>
           <span className="metric-title">Asset Utilization</span>
-          <span className="metric-value">{kpis.fleetUtilization}%</span>
+          <span className="metric-value">
+            {kpis.fleetUtilization !== '—' && kpis.fleetUtilization !== undefined ? `${kpis.fleetUtilization}%` : '—'}
+          </span>
           <span className="metric-footer">Active dispatches ratio</span>
         </div>
         <div className="card-metric" style={{ borderLeft: '3px solid #ef4444' }}>
@@ -235,8 +240,8 @@ export default function Analytics() {
                       <td style={{ fontVariantNumeric: 'tabular-nums', color: '#10b981', fontWeight: 500 }}>
                         ₹{v.revenue.toLocaleString()}
                       </td>
-                      <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: isPositive ? '#10b981' : '#ef4444' }}>
-                        {isPositive ? '+' : ''}{v.roi}%
+                      <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: v.roi === null ? '#94a3b8' : isPositive ? '#10b981' : '#ef4444' }}>
+                        {v.roi === null ? '—' : `${isPositive ? '+' : ''}${v.roi}%`}
                       </td>
                     </tr>
                   );

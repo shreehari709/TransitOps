@@ -275,7 +275,7 @@ export default function Drivers() {
               ) : (
                 <tr>
                   <td colSpan={isSafetyOfficer ? 9 : 8} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-                    No drivers found matching criteria.
+                    {drivers.length === 0 ? "No drivers registered yet — add your first one." : "No drivers found matching criteria."}
                   </td>
                 </tr>
               )}

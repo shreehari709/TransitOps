@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../App';
-import { Save, Check, ShieldAlert } from 'lucide-react';
+import { Save, ShieldAlert, LogOut, Check, X } from 'lucide-react';
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   const [depotName, setDepotName] = useState('Gandhinagar Depot');
   const [currency, setCurrency] = useState('₹');
@@ -14,9 +14,18 @@ export default function Settings() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  // Pending signups state
+  const [pendingSignups, setPendingSignups] = useState([]);
+  const [fetchingSignups, setFetchingSignups] = useState(false);
+
+  const isFleetManager = user?.role === 'FleetManager';
+
   useEffect(() => {
     fetchSettings();
-  }, []);
+    if (isFleetManager) {
+      fetchPendingSignups();
+    }
+  }, [isFleetManager]);
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -32,6 +41,21 @@ export default function Settings() {
       console.error('Failed to load settings:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingSignups = async () => {
+    setFetchingSignups(true);
+    try {
+      const res = await fetch('/api/auth/pending-signups');
+      if (res.ok) {
+        const data = await res.json();
+        setPendingSignups(data);
+      }
+    } catch (err) {
+      console.error('Failed to load pending signups:', err);
+    } finally {
+      setFetchingSignups(false);
     }
   };
 
@@ -65,7 +89,44 @@ export default function Settings() {
     }
   };
 
-  const isFleetManager = user?.role === 'FleetManager';
+  const handleApproveSignup = async (id) => {
+    try {
+      const res = await fetch(`/api/auth/approve-signup/${id}`, { method: 'POST' });
+      if (res.ok) {
+        fetchPendingSignups();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to approve user.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRejectSignup = async (id) => {
+    if (!window.confirm('Are you sure you want to reject this signup request?')) return;
+    try {
+      const res = await fetch(`/api/auth/reject-signup/${id}`, { method: 'POST' });
+      if (res.ok) {
+        fetchPendingSignups();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to reject user.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getRoleBadge = (role) => {
+    switch (role) {
+      case 'FleetManager': return 'Fleet Manager';
+      case 'Dispatcher': return 'Dispatcher';
+      case 'SafetyOfficer': return 'Safety Officer';
+      case 'FinancialAnalyst': return 'Financial Analyst';
+      default: return role;
+    }
+  };
 
   return (
     <div className="page-container">
@@ -73,7 +134,7 @@ export default function Settings() {
       <div className="page-header">
         <div className="page-title">
           <h1>Settings & RBAC</h1>
-          <p>Configure depot parameters and inspect console authorization scopes.</p>
+          <p>Configure depot parameters, manage account sessions, and inspect security rules.</p>
         </div>
       </div>
 
@@ -84,8 +145,41 @@ export default function Settings() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '32px' }}>
-          {/* General settings form */}
-          <div>
+          {/* Left Column: Account Profile & Depot Configs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Account Info Card */}
+            <div className="card-panel">
+              <div className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>Account Profile</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '16px 0' }}>
+                <div>
+                  <label style={{ fontSize: '11px', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Signed In As</label>
+                  <div style={{ fontSize: '15px', color: '#f8fafc', fontWeight: 600, marginTop: '2px' }}>{user?.name}</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Email Address</label>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginTop: '2px' }}>{user?.email}</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Role Scope</label>
+                  <div style={{ marginTop: '4px' }}>
+                    <span className="user-badge" style={{ fontSize: '12px' }}>{getRoleBadge(user?.role)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                className="btn btn-secondary" 
+                onClick={logout} 
+                style={{ width: '100%', borderColor: '#ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '8px' }}
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            </div>
+
+            {/* Depot Configurations Card */}
             <div className="card-panel">
               <div className="panel-title">Depot Configurations</div>
               
@@ -145,7 +239,7 @@ export default function Settings() {
                   <button 
                     type="submit" 
                     className="btn btn-primary" 
-                    style={{ width: '100%', marginTop: '16px', display: 'flex', gap: '8px' }}
+                    style={{ width: '100%', marginTop: '16px', display: 'flex', gap: '8px', justifyContent: 'center' }}
                     disabled={saving}
                   >
                     <Save size={16} />
@@ -161,8 +255,73 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* RBAC matrix view */}
-          <div>
+          {/* Right Column: Pending Signups & RBAC Mapping */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Pending Signups (FleetManager only) */}
+            {isFleetManager && (
+              <div className="card-panel">
+                <div className="panel-title">Pending Signups</div>
+                <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px', lineHeight: 1.4 }}>
+                  New account registration requests awaiting authorization.
+                </p>
+
+                {fetchingSignups ? (
+                  <div style={{ padding: '12px', textAlign: 'center', color: '#94a3b8' }}>
+                    <span className="pulse-dot" style={{ display: 'inline-block', marginRight: '8px' }} />
+                    Loading requests...
+                  </div>
+                ) : pendingSignups.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {pendingSignups.map(signup => (
+                      <div 
+                        key={signup._id} 
+                        style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center', 
+                          padding: '12px 16px', 
+                          border: '1px solid var(--border-color)', 
+                          borderRadius: '8px', 
+                          backgroundColor: 'rgba(30, 41, 59, 0.2)' 
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 600, color: '#f8fafc', fontSize: '14px' }}>{signup.name}</div>
+                          <div style={{ color: '#94a3b8', fontSize: '12px' }}>{signup.email}</div>
+                          <div style={{ fontSize: '11px', color: '#f59e0b', marginTop: '2px', fontWeight: 500 }}>
+                            Requested Role: {getRoleBadge(signup.role)}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button 
+                            className="btn btn-primary" 
+                            style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#10b981', borderColor: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            onClick={() => handleApproveSignup(signup._id)}
+                          >
+                            <Check size={12} />
+                            Approve
+                          </button>
+                          <button 
+                            className="btn btn-danger" 
+                            style={{ padding: '6px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            onClick={() => handleRejectSignup(signup._id)}
+                          >
+                            <X size={12} />
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '13px', color: '#94a3b8', padding: '24px 12px', textAlign: 'center', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
+                    No pending registration requests.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* RBAC matrix view */}
             <div className="card-panel">
               <div className="panel-title">Console Role Authorization Mapping (RBAC)</div>
               <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '20px', lineHeight: 1.4 }}>

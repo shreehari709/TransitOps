@@ -17,6 +17,7 @@ import {
 
 // Pages imports (we will write these next)
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Vehicles from './pages/Vehicles';
 import Drivers from './pages/Drivers';
@@ -25,6 +26,7 @@ import Maintenance from './pages/Maintenance';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import SettingsPage from './pages/Settings';
+import { requestJson } from './services/api';
 
 // Authentication Context
 const AuthContext = createContext(null);
@@ -42,13 +44,8 @@ export function AuthProvider({ children }) {
 
   const fetchMe = async () => {
     try {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
+      const data = await requestJson('/api/auth/me');
+      setUser(data.user);
     } catch (err) {
       console.error('Auth verification failed:', err);
       setUser(null);
@@ -57,22 +54,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const login = async (email, password, role) => {
-    const res = await fetch('/api/auth/login', {
+  const login = async (email, password, rememberMe) => {
+    const data = await requestJson('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password, rememberMe })
     });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Login failed.');
-    }
     setUser(data.user);
     return data;
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await requestJson('/api/auth/logout', { method: 'POST' });
     setUser(null);
   };
 
@@ -252,6 +244,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/*" element={
             <ProtectedRoute>
               <AppLayout />

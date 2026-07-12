@@ -162,7 +162,9 @@ export default function Dashboard() {
         </div>
         <div className="card-metric" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)' }}>
           <span className="metric-title" style={{ color: '#f59e0b' }}>Fleet Utilization</span>
-          <span className="metric-value" style={{ color: '#f59e0b' }}>{kpis.fleetUtilization || 0}%</span>
+          <span className="metric-value" style={{ color: '#f59e0b' }}>
+            {kpis.fleetUtilization !== '—' && kpis.fleetUtilization !== undefined ? `${kpis.fleetUtilization}%` : '—'}
+          </span>
           <span className="metric-footer">On-trip / Active Fleet</span>
         </div>
       </div>
@@ -228,7 +230,7 @@ export default function Dashboard() {
                 ) : (
                   <tr>
                     <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-                      No recent trips matching filters.
+                      {trips.length === 0 ? "No trips dispatched yet — plan your first trip." : "No recent trips matching filters."}
                     </td>
                   </tr>
                 )}
