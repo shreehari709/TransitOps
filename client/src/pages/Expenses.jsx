@@ -228,7 +228,7 @@ export default function Expenses() {
               ) : (
                 <tr>
                   <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-                    No refuels logged in system.
+                    No refuels logged yet.
                   </td>
                 </tr>
               )}
@@ -272,7 +272,7 @@ export default function Expenses() {
               ) : (
                 <tr>
                   <td colSpan="7" style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-                    No general operational expenses logged.
+                    No general operational expenses logged yet.
                   </td>
                 </tr>
               )}

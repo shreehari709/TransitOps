@@ -17,6 +17,7 @@ import {
 
 // Pages imports (we will write these next)
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Vehicles from './pages/Vehicles';
 import Drivers from './pages/Drivers';
@@ -25,6 +26,8 @@ import Maintenance from './pages/Maintenance';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import SettingsPage from './pages/Settings';
+import SuperAdminConsole from './pages/SuperAdminConsole';
+import { requestJson } from './services/api';
 
 // Authentication Context
 const AuthContext = createContext(null);
@@ -42,13 +45,8 @@ export function AuthProvider({ children }) {
 
   const fetchMe = async () => {
     try {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
+      const data = await requestJson('/api/auth/me');
+      setUser(data.user);
     } catch (err) {
       console.error('Auth verification failed:', err);
       setUser(null);
@@ -57,22 +55,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const login = async (email, password, role) => {
-    const res = await fetch('/api/auth/login', {
+  const login = async (email, password, rememberMe) => {
+    const data = await requestJson('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password, rememberMe })
     });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Login failed.');
-    }
     setUser(data.user);
     return data;
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await requestJson('/api/auth/logout', { method: 'POST' });
     setUser(null);
   };
 
@@ -100,7 +93,7 @@ function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />;
   }
   
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && user.role !== 'SuperAdmin' && !allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />;
   }
   
@@ -123,7 +116,18 @@ function AppLayout() {
     { name: 'Settings & APIs', path: '/settings', icon: Settings, roles: ['FleetManager'] }
   ];
 
-  const filteredMenu = menuItems.filter(item => item.roles.includes(user?.role));
+  const filteredMenu = menuItems.filter(item => 
+    user?.role === 'SuperAdmin' || item.roles.includes(user?.role)
+  );
+
+  if (user?.role === 'SuperAdmin') {
+    filteredMenu.push({ 
+      name: 'Super Admin Console', 
+      path: '/super-admin', 
+      icon: Users, 
+      roles: ['SuperAdmin'] 
+    });
+  }
 
   const getInitials = (name) => {
     if (!name) return 'TO';
@@ -132,6 +136,7 @@ function AppLayout() {
 
   const getRoleBadge = (role) => {
     switch (role) {
+      case 'SuperAdmin': return 'Super Admin';
       case 'FleetManager': return 'Fleet Manager';
       case 'Dispatcher': return 'Dispatcher';
       case 'SafetyOfficer': return 'Safety Officer';
@@ -237,6 +242,12 @@ function AppLayout() {
               </ProtectedRoute>
             } />
             
+            <Route path="/super-admin" element={
+              <ProtectedRoute allowedRoles={['SuperAdmin']}>
+                <SuperAdminConsole />
+              </ProtectedRoute>
+            } />
+            
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>
@@ -252,6 +263,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/*" element={
             <ProtectedRoute>
               <AppLayout />
