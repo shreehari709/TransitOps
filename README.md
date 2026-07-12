@@ -111,7 +111,7 @@ Create a `.env` file inside the `server/` directory:
 JWT_SECRET=super_secret_key_for_transitops_app_12345
 
 # MongoDB Atlas URI (Omitting this will boot an ephemeral in-memory MongoDB instance)
-MONGODB_URI=mongodb+srv://backend:BSl5HZooEDcEz4i5@cluster0.sha48qi.mongodb.net/backend
+MONGODB_URI=
 
 # Server Execution Parameters
 PORT=5000
